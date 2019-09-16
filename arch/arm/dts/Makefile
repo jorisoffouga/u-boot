@@ -625,8 +625,7 @@ dtb-$(CONFIG_MX7) += imx7d-sdb.dtb \
 	imx7-colibri-emmc.dtb \
 	imx7-colibri-rawnand.dtb \
 	imx7s-warp.dtb \
-	imx7d-pico-pi.dtb \
-	imx7d-pico-hobbit.dtb
+	pico-imx7d-som.dtb \
 
 
 dtb-$(CONFIG_ARCH_MX7ULP) += imx7ulp-evk.dtb

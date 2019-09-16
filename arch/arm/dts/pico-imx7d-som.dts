@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+//
+// Copyright 2019 Joris Offouga
+
+/dts-v1/;
+
+#include "imx7d-pico.dtsi"
+#include "imx7d-pico-u-boot.dtsi"
+
+
+/ {
+	model = "TechNexion PICO-IMX7D SOM ";
+	compatible = "technexion,pico-imx7d-som", "fsl,imx7d";
+};
