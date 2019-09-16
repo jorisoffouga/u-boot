@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+//
+// Copyright 2019 Joris Offouga.
+
+/dts-v1/;
+
+#include "imx6ul-pico.dtsi"
+
+/ {
+	model = "TechNexion PICO-IMX6UL SOM";
+	compatible = "technexion,pico-imx6ul-som", "fsl,imx6ul";
+};
