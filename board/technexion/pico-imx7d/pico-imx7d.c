@@ -30,27 +30,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define ENET_RX_PAD_CTRL  (PAD_CTL_PUS_PU100KOHM | PAD_CTL_DSE_3P3V_49OHM)
 
-#define I2C_PAD_CTRL    (PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_SRE_SLOW | \
-	PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PUS_PU100KOHM)
-
-#ifdef CONFIG_SYS_I2C_MXC
-#define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
-
-/* I2C4 for PMIC */
-static struct i2c_pads_info i2c_pad_info4 = {
-	.scl = {
-		.i2c_mode = MX7D_PAD_SAI1_RX_SYNC__I2C4_SCL | PC,
-		.gpio_mode = MX7D_PAD_SAI1_RX_SYNC__GPIO6_IO16 | PC,
-		.gp = IMX_GPIO_NR(6, 16),
-	},
-	.sda = {
-		.i2c_mode = MX7D_PAD_SAI1_RX_BCLK__I2C4_SDA | PC,
-		.gpio_mode = MX7D_PAD_SAI1_RX_BCLK__GPIO6_IO17 | PC,
-		.gp = IMX_GPIO_NR(6, 17),
-	},
-};
-#endif
-
 int dram_init(void)
 {
 	gd->ram_size = imx_ddr_size();
@@ -208,11 +187,6 @@ static void setup_iomux_uart(void)
 int board_early_init_f(void)
 {
 	setup_iomux_uart();
-
-#ifdef CONFIG_SYS_I2C_MXC
-	setup_i2c(3, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info4);
-#endif
-
 	return 0;
 }
 
