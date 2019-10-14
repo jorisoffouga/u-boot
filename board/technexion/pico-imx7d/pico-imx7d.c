@@ -42,50 +42,43 @@ int dram_init(void)
 	return 0;
 }
 
-#ifdef CONFIG_POWER
-#define I2C_PMIC	3
+#ifdef CONFIG_DM_PMIC
 int power_init_board(void)
 {
-	struct pmic *p;
+	struct udevice *dev;
 	int ret;
-	unsigned int reg, rev_id;
+	unsigned int reg, rev_id, dev_id;
 
-	ret = power_pfuze3000_init(I2C_PMIC);
-	if (ret)
-		return ret;
+	ret = pmic_get("pfuze3000", &dev);
+	if (ret == -ENODEV)
+		return 0;
 
-	p = pmic_get("PFUZE3000");
-	ret = pmic_probe(p);
 	if (ret) {
 		printf("Warning:  Cannot find PMIC PFUZE3000\n");
 		printf("\tPower consumption is not optimized.\n");
 		return 0;
 	}
 
-	pmic_reg_read(p, PFUZE3000_DEVICEID, &reg);
-	pmic_reg_read(p, PFUZE3000_REVID, &rev_id);
-	printf("PMIC:  PFUZE3000 DEV_ID=0x%x REV_ID=0x%x\n", reg, rev_id);
+	dev_id = pmic_reg_read(dev, PFUZE3000_DEVICEID);
+	rev_id = pmic_reg_read(dev, PFUZE3000_REVID);
+	printf("PMIC:  PFUZE3000 DEV_ID=0x%x REV_ID=0x%x\n", dev_id, rev_id);
 
 	/* disable Low Power Mode during standby mode */
-	pmic_reg_read(p, PFUZE3000_LDOGCTL, &reg);
-	reg |= 0x1;
-	pmic_reg_write(p, PFUZE3000_LDOGCTL, reg);
+	pmic_clrsetbits(dev, PFUZE3000_LDOGCTL, 1, 1);
 
 	/* SW1A/1B mode set to APS/APS */
-	reg = 0x8;
-	pmic_reg_write(p, PFUZE3000_SW1AMODE, reg);
-	pmic_reg_write(p, PFUZE3000_SW1BMODE, reg);
+	pmic_reg_write(dev, PFUZE3000_SW1AMODE, 0x8);
+	pmic_reg_write(dev, PFUZE3000_SW1BMODE, 0x8);
 
 	/* SW1A/1B standby voltage set to 1.025V */
-	reg = 0xd;
-	pmic_reg_write(p, PFUZE3000_SW1ASTBY, reg);
-	pmic_reg_write(p, PFUZE3000_SW1BSTBY, reg);
+	pmic_reg_write(dev, PFUZE3000_SW1ASTBY, 0xd);
+	pmic_reg_write(dev, PFUZE3000_SW1BSTBY, 0xd);
 
 	/* decrease SW1B normal voltage to 0.975V */
-	pmic_reg_read(p, PFUZE3000_SW1BVOLT, &reg);
+	reg = pmic_reg_read(dev, PFUZE3000_SW1BVOLT);
 	reg &= ~0x1f;
 	reg |= PFUZE3000_SW1AB_SETP(975);
-	pmic_reg_write(p, PFUZE3000_SW1BVOLT, reg);
+	pmic_reg_write(dev, PFUZE3000_SW1BVOLT, reg);
 
 	return 0;
 }
@@ -208,9 +201,7 @@ int board_init(void)
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
 
 #ifdef CONFIG_DM_VIDEO
-
 	setup_lcd();
-
 #endif
 #ifdef CONFIG_FEC_MXC
 	setup_fec();
